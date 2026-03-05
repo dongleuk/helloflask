@@ -6,6 +6,11 @@ app = Flask(__name__)
 def hello():
     return "Hello from Kubernetes!"
 
+
+@app.route("/goose")
+def goose():
+    return "It's a goose!"
+
 @app.route("/health")
 def health():
     return {"status": "ok"}
