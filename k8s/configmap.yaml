@@ -4,6 +4,10 @@ metadata:
   name: hello-flask-config
 data:
   APP_MESSAGE: "Hello from a Kubernetes ConfigMap!"
+  DB_HOST: postgres-service
+  DB_NAME: shopping
+  DB_USER: shopping
+  DB_PASS: shoppingpass
 ---
 apiVersion: v1
 kind: ConfigMap

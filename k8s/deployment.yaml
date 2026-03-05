@@ -35,6 +35,26 @@ spec:
             configMapKeyRef:
               name: hello-flask-config
               key: APP_MESSAGE
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: hello-flask-config
+              key: DB_HOST
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: hello-flask-config
+              key: DB_USER
+        - name: DB_PASS
+          valueFrom:
+            configMapKeyRef:
+              name: hello-flask-config
+              key: DB_PASS
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: hello-flask-config
+              key: DB_NAME
         volumeMounts:
         - name: config-volume
           mountPath: /config

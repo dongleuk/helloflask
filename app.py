@@ -4,7 +4,22 @@ from flask import Flask, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "sqlite:///shopping.db")
+#database_url = os.getenv(
+#    "DATABASE_URL",
+#    "postgresql+psycopg://shopping:shoppingpass@localhost:5432/shopping",
+#)
+# Handle older-style URLs used by some tooling/platforms.
+#if database_url.startswith("postgres://"):
+#    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+DB_HOST = os.getenv("DB_HOST", "localhost")
+DB_USER = os.getenv("DB_USER","shopping")
+DB_PASSWORD = os.getenv("DB_PASSWORD","shoppingpass")
+DB_NAME = os.getenv("DB_NAME","shopping")
+
+DATABASE_URL = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:5432/{DB_NAME}"
+
+app.config["SQLALCHEMY_DATABASE_URI"] = DATABASE_URL
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db = SQLAlchemy(app)
