@@ -23,10 +23,22 @@ spec:
             port: 5000
           initialDelaySeconds: 5
           periodSeconds: 10
-
         readinessProbe:
           httpGet:
             path: /health
             port: 5000
           initialDelaySeconds: 5
           periodSeconds: 5
+        env:
+        - name: APP_MESSAGE
+          valueFrom:
+            configMapKeyRef:
+              name: hello-flask-config
+              key: APP_MESSAGE
+        volumeMounts:
+        - name: config-volume
+          mountPath: /config
+      volumes:
+      - name: config-volume
+        configMap:
+          name: hello-flask-config-mount
