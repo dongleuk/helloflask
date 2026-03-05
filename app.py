@@ -1,10 +1,12 @@
 from flask import Flask
+import os
 
 app = Flask(__name__)
+message = os.getenv("APP_MESSAGE", "Hello from Kubernetes!")
 
 @app.route("/")
 def hello():
-    return "Hello from Kubernetes!"
+    return message
 
 
 @app.route("/goose")
