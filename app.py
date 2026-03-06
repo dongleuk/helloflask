@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, redirect, render_template, request, session, url_for
+from flask import Flask, abort, g, redirect, render_template, request, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -67,8 +67,16 @@ def require_auth():
     if request.endpoint in public_endpoints:
         return None
 
-    if request.endpoint and "user_id" not in session:
+    user_id = session.get("user_id")
+    if request.endpoint and user_id is None:
         return redirect(url_for("login"))
+
+    user = db.session.get(User, user_id)
+    if user is None:
+        session.clear()
+        return redirect(url_for("login"))
+
+    g.current_user = user
     return None
 
 
@@ -82,7 +90,6 @@ def login():
 
         if user and check_password_hash(user.password_hash, password):
             session["user_id"] = user.id
-            session["username"] = user.username
             return redirect(url_for("index"))
 
         error = "Invalid username or password."
@@ -99,7 +106,75 @@ def logout():
 @app.route("/")
 def index():
     items = Item.query.order_by(Item.id.desc()).all()
-    return render_template("index.html", items=items, username=session.get("username"))
+    return render_template(
+        "index.html",
+        items=items,
+        username=g.current_user.username,
+        is_admin=g.current_user.is_admin,
+    )
+
+
+@app.route("/admin/users")
+def user_management():
+    if not g.current_user.is_admin:
+        abort(403)
+
+    users = User.query.order_by(User.username.asc()).all()
+    return render_template("users.html", users=users, username=g.current_user.username)
+
+
+@app.post("/admin/users")
+def create_user():
+    if not g.current_user.is_admin:
+        abort(403)
+
+    username = request.form.get("username", "").strip()
+    password = request.form.get("password", "")
+    is_admin = request.form.get("is_admin") == "on"
+
+    if not username or not password:
+        return redirect(url_for("user_management"))
+
+    existing_user = User.query.filter_by(username=username).first()
+    if existing_user:
+        return redirect(url_for("user_management"))
+
+    user = User(
+        username=username,
+        password_hash=generate_password_hash(password),
+        is_admin=is_admin,
+    )
+    db.session.add(user)
+    db.session.commit()
+    return redirect(url_for("user_management"))
+
+
+@app.post("/admin/users/<int:user_id>/toggle-admin")
+def toggle_user_admin(user_id: int):
+    if not g.current_user.is_admin:
+        abort(403)
+
+    user = User.query.get_or_404(user_id)
+    if user.id == g.current_user.id:
+        return redirect(url_for("user_management"))
+
+    user.is_admin = not user.is_admin
+    db.session.commit()
+    return redirect(url_for("user_management"))
+
+
+@app.post("/admin/users/<int:user_id>/delete")
+def delete_user(user_id: int):
+    if not g.current_user.is_admin:
+        abort(403)
+
+    user = User.query.get_or_404(user_id)
+    if user.id == g.current_user.id:
+        return redirect(url_for("user_management"))
+
+    db.session.delete(user)
+    db.session.commit()
+    return redirect(url_for("user_management"))
 
 
 @app.post("/items")

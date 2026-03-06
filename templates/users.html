@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>User Management</title>
+    <style>
+      body { font-family: sans-serif; max-width: 820px; margin: 2rem auto; padding: 0 1rem; }
+      h1, h2 { margin-bottom: 0.75rem; }
+      table { width: 100%; border-collapse: collapse; margin: 1rem 0 2rem; }
+      th, td { text-align: left; border-bottom: 1px solid #ddd; padding: 0.6rem; }
+      form.inline { display: inline; margin: 0; }
+      input, button { padding: 0.45rem; }
+      .actions { display: flex; gap: 0.5rem; }
+      .danger { background: #b91c1c; color: #fff; border: 0; cursor: pointer; }
+    </style>
+  </head>
+  <body>
+    <h1>User Management</h1>
+    <p>Logged in as <strong>{{ username }}</strong></p>
+    <p>
+      <a href="{{ url_for('index') }}">Back to Shopping List</a>
+    </p>
+
+    <h2>Existing Users</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Role</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td>{{ user.username }}</td>
+          <td>{% if user.is_admin %}Admin{% else %}User{% endif %}</td>
+          <td>
+            {% if user.username == username %}
+            Current user
+            {% else %}
+            <div class="actions">
+              <form class="inline" method="post" action="{{ url_for('toggle_user_admin', user_id=user.id) }}">
+                <button type="submit">
+                  {% if user.is_admin %}Remove Admin{% else %}Make Admin{% endif %}
+                </button>
+              </form>
+              <form class="inline" method="post" action="{{ url_for('delete_user', user_id=user.id) }}">
+                <button class="danger" type="submit">Delete</button>
+              </form>
+            </div>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="3">No users found.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <h2>Create User</h2>
+    <form method="post" action="{{ url_for('create_user') }}">
+      <p>
+        <label for="username">Username</label><br>
+        <input id="username" name="username" required>
+      </p>
+      <p>
+        <label for="password">Password</label><br>
+        <input id="password" type="password" name="password" required>
+      </p>
+      <p>
+        <label>
+          <input type="checkbox" name="is_admin"> Administrator
+        </label>
+      </p>
+      <button type="submit">Create User</button>
+    </form>
+  </body>
+</html>
