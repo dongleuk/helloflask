@@ -7,6 +7,8 @@ data:
   DB_HOST: postgres-service
   DB_NAME: shopping
   DB_USER: shopping
+  ADMIN_USERNAME: admin
+  ADMIN_PASSWORD: changeme-admin-password
 ---
 apiVersion: v1
 kind: ConfigMap

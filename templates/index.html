@@ -18,6 +18,10 @@
   </head>
   <body>
     <h1>Shopping List</h1>
+    <p>Logged in as <strong>{{ username }}</strong></p>
+    <form method="post" action="{{ url_for('logout') }}">
+      <button type="submit">Logout</button>
+    </form>
 
     <form method="post" action="{{ url_for('create_item') }}">
       <input name="name" placeholder="Item name" required>
