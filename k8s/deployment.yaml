@@ -47,8 +47,8 @@ spec:
               key: DB_USER
         - name: DB_PASS
           valueFrom:
-            configMapKeyRef:
-              name: hello-flask-config
+            secretKeyRef:
+              name: hello-flask-secrets
               key: DB_PASS
         - name: DB_NAME
           valueFrom:

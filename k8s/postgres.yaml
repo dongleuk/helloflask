@@ -34,7 +34,10 @@ spec:
         - name: POSTGRES_USER
           value: shopping
         - name: POSTGRES_PASSWORD
-          value: shoppingpass
+          valueFrom:
+            secretKeyRef:
+              name: hello-flask-secrets
+              key: DB_PASS
         volumeMounts:
         - mountPath: /var/lib/postgresql/data
           name: postgres-storage

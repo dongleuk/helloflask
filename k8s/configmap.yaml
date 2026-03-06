@@ -7,7 +7,6 @@ data:
   DB_HOST: postgres-service
   DB_NAME: shopping
   DB_USER: shopping
-  DB_PASS: shoppingpass
 ---
 apiVersion: v1
 kind: ConfigMap
